@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Rain Prediction</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      /*background: linear-gradient(135deg, #4facfe, #00f2fe);*/
+      background: url('2.jpg') 
+              no-repeat center center fixed;
+
+  
+
+    .login-container {
+      background: white;
+      padding: 60px 70px; /* 🔹 Increased padding for a bigger box */
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+      text-align: center;
+      width: 400px; /* 🔹 Increased width */
+      animation: fadeIn 0.8s ease-in-out;
+    }
+
+    .login-container h1 {
+      color: #0078ff;
+      font-size: 32px; /* Slightly larger title */
+      margin-bottom: 15px;
+    }
+
+    .login-container h2 {
+      color: #333;
+      margin-bottom: 35px;
+      font-weight: 500;
+      font-size: 22px;
+    }
+
+    .login-container input {
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 25px;
+      border: 2px solid #0078ff;
+      border-radius: 10px;
+      outline: none;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .login-container input:focus {
+      border-color: #00bfff;
+      box-shadow: 0 0 5px rgba(0, 191, 255, 0.4);
+    }
+
+    .login-container button {
+      width: 100%;
+      padding: 15px;
+      background-color: #73d3ed; /* 🔹 Changed button color (orange tone) */
+      border: none;
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .login-container button:hover {
+      background-color: #55b0fb; /* 🔹 Darker shade on hover */
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h1>🌦 Rain Prediction</h1>
+    <h2>Login</h2>
+    <form onsubmit="return goToHome(event)">
+      <input type="text" id="username" placeholder="Enter Username" required />
+      <button type="submit">Login</button>
+    </form>
+  </div>
+
+  <script>
+    function goToHome(event) {
+      event.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      if (username) {
+        window.location.href = "index.html"; // ✅ Redirects to your main page
+      } else {
+        alert("Please enter your username!");
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Will It Rain On My Parade?</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin:0; padding:0; }
+    /* body {
+      font-family: 'Roboto', sans-serif;
+      min-height: 100vh;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      text-align: center;
+
+   
+      background: url('3.jpg') no-repeat center center/cover;
+      position: relative;
+    } */
+
+    body {
+  font-family: 'Roboto', sans-serif;
+  min-height: 100vh;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  text-align: center;
+
+  /* High-quality background */
+  background: url('5.jpg') 
+              no-repeat center center fixed;
+  background-size: cover;
+  position: relative;
+}
+
+
+    body::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.45); /* Dark overlay */
+  z-index: 0;
+}
+
+    /* body::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(2px);
+      z-index: 0;
+    } */
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 800px;
+    }
+
+    h1 {
+      font-family: 'Times New Roman', Times, serif;
+      margin-top: 40px;
+      font-size: 2.8rem;
+      color:#f8f8fa;
+      text-shadow: 2px 2px 10px rgba(124, 119, 119, 0.7);
+      animation: fadeIn 1.5s ease-in-out;
+    }
+
+    p.subtitle {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+      color: #d1f5ff;
+    }
+
+    .input-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 30px;
+      animation: slideUp 1s ease-in-out;
+    }
+
+    input, button {
+      padding: 12px 18px;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    input {
+      width: 200px;
+    }
+
+    button {
+      background: #bccfcd;
+      color: #203a43;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #bae6de;
+    }
+
+    #result {
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 25px;
+      border-radius: 15px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+      font-size: 1.1rem;
+      line-height: 1.6;
+      display: none;
+      animation: fadeIn 1s ease-in-out;
+      backdrop-filter: blur(8px);
+    }
+
+    #result h2 {
+      margin-bottom: 10px;
+      font-size: 1.6rem;
+      color: #060c0b;
+    }
+
+    .risk-high { color: #ff6b6b; font-weight: bold; }
+    .risk-moderate { color: #ffd93d; font-weight: bold; }
+    .risk-low { color: #4ef0a7; font-weight: bold; }
+
+    @media (max-width: 600px) {
+      input { width: 100%; }
+      .input-container { flex-direction: column; align-items: center; }
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(50px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>☁ Will It Rain On My Parade?</h1>
+    <p class="subtitle">Enter your location, date, and time to get a data-backed rainfall prediction!</p>
+
+    <div class="input-container">
+      <input type="text" id="location" placeholder="Enter location (e.g., Kochi)">
+      <input type="date" id="date">
+      <input type="time" id="time">
+      <button onclick="checkRain()">Check Weather</button>
+    </div>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    async function checkRain() {
+      const location = document.getElementById('location').value;
+      const date = document.getElementById('date').value;
+      const time = document.getElementById('time').value;
+
+      if (!location || !date) {
+        alert("Please enter both location and date!");
+        return;
+      }
+
+      try {
+        // Get coordinates using Open-Meteo geocoding API
+        const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${location}&count=1&language=en&format=json`);
+        const geoData = await geoRes.json();
+
+        if (!geoData.results || geoData.results.length === 0) {
+          document.getElementById('result').style.display = "block";
+          document.getElementById('result').innerHTML = "<p>❌ Location not found.</p>";
+          return;
+        }
+
+        const lat = geoData.results[0].latitude;
+        const lon = geoData.results[0].longitude;
+        const place = geoData.results[0].name;
+
+        // Call Flask backend
+        const res = await fetch(`http://127.0.0.1:5000/api/rain?lat=${lat}&lon=${lon}&date=${date}`);
+        const data = await res.json();
+
+        const resultDiv = document.getElementById('result');
+        resultDiv.style.display = "block";
+
+        if (data.error) {
+          resultDiv.innerHTML = `<p>❌ ${data.error}</p>`;
+          return;
+        }
+
+        // Rain risk levels
+        let riskClass = "risk-low";
+        let riskMsg = "✅ Low chance of rain — perfect for your parade!";
+        if (data.probability_percent >= 60) {
+          riskClass = "risk-high";
+          riskMsg = "⚠ High chance of rain — carry an umbrella!";
+        } else if (data.probability_percent >= 30) {
+          riskClass = "risk-moderate";
+          riskMsg = "🌤 Moderate chance of rain — consider a backup plan.";
+        }
+
+        // Show results
+        resultDiv.innerHTML = `
+          <h2>📍 ${place}</h2>
+          <p>🗓 Date: ${data.date} | 🕒 Time: ${time || "All day"}</p>
+          <p>🌧 Forecast Rain: <b>${data.forecast_rain_mm} mm</b></p>
+          <p>☔ Probability: <b>${data.probability_percent}%</b></p>
+          <p class="${riskClass}">${riskMsg}</p>
+        `;
+      } catch (err) {
+        const resultDiv = document.getElementById('result');
+        resultDiv.style.display = "block";
+        resultDiv.innerHTML = "<p>❌ Failed to fetch weather data. Try again.</p>";
+        console.error(err);
+      }
+    }
+  </script>
+</body>
+</html>
